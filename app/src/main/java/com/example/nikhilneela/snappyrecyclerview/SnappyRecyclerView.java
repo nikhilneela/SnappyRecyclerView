@@ -34,12 +34,8 @@ public class SnappyRecyclerView extends RecyclerView {
     public SnappyRecyclerView(Context context, @Nullable AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         left = new ClippingInfo();
-        left.tag = "Left";
         middle = new ClippingInfo();
-        middle.tag = "Middle";
         right = new ClippingInfo();
-        right.tag = "Right";
-
     }
 
     private boolean mAutoSet = false;
@@ -97,7 +93,6 @@ public class SnappyRecyclerView extends RecyclerView {
 
 
     private static class ClippingInfo {
-        private String tag;
         private View view;
         private int clippedArea;
         private int adapterPosition;
@@ -112,7 +107,12 @@ public class SnappyRecyclerView extends RecyclerView {
 
         @Override
         public String toString() {
-            return tag + " " + " CA = " + clippedArea + " POS = " + adapterPosition;
+            if (view != null) {
+                return "Width " + view.getWidth() + " CA = " + clippedArea + " POS = " + adapterPosition;
+
+            } else {
+                return " CA = " + clippedArea + " POS = " + adapterPosition;
+            }
         }
     }
 }
