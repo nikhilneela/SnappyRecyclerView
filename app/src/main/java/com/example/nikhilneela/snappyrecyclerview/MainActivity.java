@@ -7,7 +7,6 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mRecyclerView = (SnappyRecyclerView) findViewById(R.id.snappy_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        mRecyclerView.addItemDecoration(new GridItemSpacing(30));
+        mRecyclerView.addItemDecoration(new HorizontalItemSpacing(15));
         mRecyclerView.setAdapter(new SnappyAdapter());
     }
 
@@ -65,15 +64,24 @@ public class MainActivity extends AppCompatActivity {
         public SnappyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, null);
             SnappyViewHolder viewHolder = new  SnappyViewHolder(view);
-            viewHolder.mRecyclerView.setLayoutManager(new GridLayoutManager(MainActivity.this, 2, LinearLayoutManager.VERTICAL, false));
+            GridLayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this, 2, LinearLayoutManager.VERTICAL, false);
+            gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                @Override
+                public int getSpanSize(int position) {
+                    if (position == 0) {
+                        return 2;
+                    }
+                    return 1;
+                }
+            });
+            viewHolder.mRecyclerView.setLayoutManager(gridLayoutManager);
             viewHolder.mRecyclerView.setAdapter(new InnerRecyclerViewAdapter());
-            viewHolder.mRecyclerView.addItemDecoration(new GridItemSpacing(20));
+            viewHolder.mRecyclerView.addItemDecoration(new GridItemSpacing(3));
             return viewHolder;
         }
 
         @Override
         public void onBindViewHolder(SnappyViewHolder holder, int position) {
-            holder.headerTextView.setText("SnappyItem = " + position);
         }
 
         @Override
@@ -85,27 +93,34 @@ public class MainActivity extends AppCompatActivity {
     private class SnappyViewHolder extends RecyclerView.ViewHolder  {
         private CardView mCardView;
         private RecyclerView mRecyclerView;
-        private TextView headerTextView;
         public SnappyViewHolder(View itemView) {
             super(itemView);
             mCardView = (CardView) itemView.findViewById(R.id.list_item);
             mRecyclerView = (RecyclerView) mCardView.findViewById(R.id.inner_recycler_view);
             mRecyclerView.setNestedScrollingEnabled(false);
-            headerTextView = (TextView) mCardView.findViewById(R.id.header_text);
         }
     }
 
 
     private class InnerRecyclerViewAdapter extends RecyclerView.Adapter<InnerRecyclerViewHolder> {
+
+        private int SMALL_IMAGE_TYPE = 0;
+        private int LARGE_IMAGE_TYPE = 1;
+
         @Override
         public InnerRecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.inner_list_item, null);
+            View view;
+            if (viewType == SMALL_IMAGE_TYPE) {
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.inner_list_item_small, null);
+            } else {
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.inner_list_item_large, null);
+            }
             return new InnerRecyclerViewHolder(view);
         }
 
         @Override
         public void onBindViewHolder(InnerRecyclerViewHolder holder, int position) {
-            holder.mTextView.setText("Item " + position);
+            holder.mSimpleTextView.setText("Item " + position);
         }
 
         @Override
@@ -117,14 +132,25 @@ public class MainActivity extends AppCompatActivity {
         public void onViewRecycled(InnerRecyclerViewHolder holder) {
             super.onViewRecycled(holder);
         }
+
+        @Override
+        public int getItemViewType(int position) {
+            if (position == 0) {
+                return LARGE_IMAGE_TYPE;
+            } else {
+                return SMALL_IMAGE_TYPE;
+            }
+        }
     }
 
 
     private class InnerRecyclerViewHolder extends RecyclerView.ViewHolder {
-        private TextView mTextView;
+        private CardView mSimpleCardView;
+        private TextView mSimpleTextView;
         public InnerRecyclerViewHolder(View itemView) {
             super(itemView);
-            mTextView = (TextView) itemView.findViewById(R.id.inner_text_view);
+            mSimpleCardView = (CardView) itemView.findViewById(R.id.simple_card_view);
+            mSimpleTextView = (TextView) itemView.findViewById(R.id.simple_text_view);
         }
     }
 }

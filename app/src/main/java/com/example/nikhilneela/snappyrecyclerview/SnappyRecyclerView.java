@@ -63,7 +63,7 @@ public class SnappyRecyclerView extends RecyclerView {
 
                 Log.d(TAG, "Final = " + inter1.toString());
                 mAutoSet = false;
-                int scrollNeeded = inter1.view.getLeft() - 70;
+                int scrollNeeded = inter1.view.getLeft() - 55;
                 smoothScrollBy(scrollNeeded, 0);
 
         }
